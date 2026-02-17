@@ -74,7 +74,10 @@ type BaseURLVariable struct {
 	Description string
 }
 
-var customRegexRemoval = regexp.MustCompile(`{(\w+)\:[^}]+}`)
+var (
+	customRegexRemoval = regexp.MustCompile(`{(\w+)\:[^}]+}`)
+	ffExtensionKeyRegexp = regexp.MustCompile(`^x-.+$`)
+)
 
 type SwaggerGen struct {
 	options *SwaggerGenOptions
@@ -184,9 +187,37 @@ func (sg *SwaggerGen) ffOutputTagHandler(ctx context.Context, route *Route, name
 	return sg.ffTagHandler(ctx, route, name, tag, schema)
 }
 
+func (sg *SwaggerGen) applyFFExtensionsTag(ctx context.Context, schema *openapi3.Schema, tag string) error {
+	if tag == "" {
+		return nil
+	}
+	for _, extension := range strings.Split(tag, ",") {
+		kv := strings.SplitN(strings.TrimSpace(extension), "=", 2)
+		if len(kv) != 2 {
+			return i18n.NewError(ctx, i18n.MsgFFExtensionsInvalid, extension)
+		}
+		key := strings.TrimSpace(kv[0])
+		if !ffExtensionKeyRegexp.MatchString(key) {
+			return i18n.NewError(ctx, i18n.MsgFFExtensionsKeyInvalid, key)
+		}
+		val := strings.TrimSpace(kv[1])
+		if schema.Extensions == nil {
+			schema.Extensions = make(map[string]interface{})
+		}
+		schema.Extensions[key] = val
+	}
+	return nil
+}
+
+
 func (sg *SwaggerGen) ffTagHandler(ctx context.Context, route *Route, name string, tag reflect.StructTag, schema *openapi3.Schema) error {
 	if ffEnum := tag.Get("ffenum"); ffEnum != "" {
 		schema.Enum = fftypes.FFEnumValues(ffEnum)
+	}
+	if ffExtensions := tag.Get("ffextensions"); ffExtensions != "" {
+		if err := sg.applyFFExtensionsTag(ctx, schema, ffExtensions); err != nil {
+			return err
+		}
 	}
 	if sg.isTrue(tag.Get("ffexclude")) {
 		return &openapi3gen.ExcludeSchemaSentinel{}

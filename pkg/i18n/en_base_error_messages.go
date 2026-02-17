@@ -192,4 +192,6 @@ var (
 	MsgRoutePathNotStartWithSlash                  = ffe("FF00255", "Route path '%s' must not start with '/'")
 	MsgMethodNotAllowed                            = ffe("FF00256", "Method not allowed", http.StatusMethodNotAllowed)
 	MsgInvalidLogLevel                             = ffe("FF00257", "Invalid log level: '%s'", http.StatusBadRequest)
+	MsgFFExtensionsInvalid                         = ffe("FF00258", "Invalid extension '%s' - extensions must follow the format 'x-<name>=<value>'", http.StatusBadRequest)
+	MsgFFExtensionsKeyInvalid                      = ffe("FF00259", "Invalid extension key '%s' - extension keys must follow the format 'x-<name>'", http.StatusBadRequest)
 )
