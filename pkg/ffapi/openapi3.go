@@ -76,6 +76,7 @@ type BaseURLVariable struct {
 
 var (
 	customRegexRemoval = regexp.MustCompile(`{(\w+)\:[^}]+}`)
+    // Check ffExtension key starts with "x-"
 	ffExtensionKeyRegexp = regexp.MustCompile(`^x-.+$`)
 )
 
