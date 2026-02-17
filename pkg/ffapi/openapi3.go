@@ -76,7 +76,7 @@ type BaseURLVariable struct {
 
 var (
 	customRegexRemoval = regexp.MustCompile(`{(\w+)\:[^}]+}`)
-    // Check ffExtension key starts with "x-"
+	// Check ffExtension key starts with "x-"
 	ffExtensionKeyRegexp = regexp.MustCompile(`^x-.+$`)
 )
 
@@ -209,7 +209,6 @@ func (sg *SwaggerGen) applyFFExtensionsTag(ctx context.Context, schema *openapi3
 	}
 	return nil
 }
-
 
 func (sg *SwaggerGen) ffTagHandler(ctx context.Context, route *Route, name string, tag reflect.StructTag, schema *openapi3.Schema) error {
 	if ffEnum := tag.Get("ffenum"); ffEnum != "" {
